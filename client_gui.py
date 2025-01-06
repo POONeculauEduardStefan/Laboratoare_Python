@@ -1,6 +1,5 @@
 import tkinter as tk
 
-
 window = None
 canvas = None
 circles = []
@@ -14,23 +13,31 @@ temp_circle_col = None
 
 #starts the gui board
 def create_gui(rows, cols,set_move_function,player_number):
+
+    """Takes the number of rows and columns and creates a window with a board that resembles Connect 4."""
+
     global window, canvas,circles,nrows,ncols,set_move_callback,playercolor
     window = tk.Tk()
     window.title("Connect 4")
     nrows=rows
     ncols=cols
     player_num=player_number
+
+    """different player_numbers get different colors"""
     if player_num == 1:
         playercolor = 'red'
     else:
         playercolor = 'yellow'
+
+    """function for changing the current_move in client script"""
     set_move_callback = set_move_function
-    # Set up the canvas to display the game board
+
+    """Creates a blue table with a white background."""
     canvas = tk.Canvas(window, width=cols * 80, height=(rows * 80 + 100), bg="blue")
     canvas.pack()
     canvas.create_rectangle(0, 0, cols * 80, 100, fill="white", outline="white")
 
-
+    """fills in white circles where the players pieces will fall.This step will give the table a connect 4 feel"""
     for row in range(rows):
         rowcircles = []
         for col in range(cols):
@@ -41,11 +48,13 @@ def create_gui(rows, cols,set_move_function,player_number):
             rowcircles.append(circle)
         circles.append(rowcircles)
 
+    """Bind the movement and the click to know where the player has clicked"""
     canvas.bind("<Motion>", lambda event, canvas=canvas, cols=ncols: on_hover(event, canvas, cols))
     canvas.bind("<Button-1>", lambda event, canvas=canvas, cols=ncols: on_click(event, canvas, cols))
 
 #updates the gui board
 def update_circle(row, col, cell_value):
+            """helper function that changes a circle's color in circles matrix.This will give the efect of a piece being there"""
             if cell_value == 1:
                 fill_color = "red"
             elif cell_value == 2:
@@ -57,6 +66,7 @@ def update_circle(row, col, cell_value):
             canvas.itemconfig(circle,fill = fill_color)
 
 def update_gui(board):
+    """for a given board it will change all the circles accordingly"""
     for row in range(nrows):
         for col in range(ncols):
             update_circle(row,col,board[row][col])
@@ -65,6 +75,7 @@ def update_gui(board):
 
 #handle click
 def canmakeamove(val):
+    """the function that enables the player to make a move.It does this by changing the variable "canmake" """
     global canmake
     canmake = val
     if val == True :
@@ -74,6 +85,7 @@ def canmakeamove(val):
 
 
 def on_click(event,canvas,cols):
+    """if canmake is true than the players move is registered and the column he pressed on is remembered"""
     if canmake == True :
         col = event.x // 80  # Adjust 100 to the width of your cells
         if set_move_callback:
@@ -81,6 +93,7 @@ def on_click(event,canvas,cols):
 
 
 def on_hover(event, canvas, cols):
+    """This function will display a circle of the player's color above a column to help the player visualize which column they are selecting."""
     global temp_circle, temp_circle_col
     if canmake:
         col = event.x // 80
@@ -97,6 +110,7 @@ def on_hover(event, canvas, cols):
 
 
 def show_message(message):
+    """this will show  "message" on the upper right corner"""
     message_label = canvas.create_text(400, 50, text=message, font=('Helvetica', 24), fill='black')
     canvas.after(2000, canvas.delete, message_label)
 
@@ -104,5 +118,8 @@ def show_message(message):
 # Start the Tkinter event loop
 # Example usage: Display a 6x7 board (rows x columns)
 def run_gui():
+    """this starts the window.mainloop"""
     if window is not None:
         window.mainloop()
+def stop_gui():
+    window.destroy()
